@@ -1,0 +1,21 @@
+version: '3.4'
+ 
+services:    
+  akka-neo4j-app:
+    image: ${DOCKER_REGISTRY-}akka-neo4j-app
+    build:
+      context: .
+      dockerfile: AkkaNeo4j/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+    ports:
+      - 5000:80
+    depends_on:
+      - neo4j
+
+  neo4j:
+    image: bitnami/neo4j:latest  
+    ports:
+      - '7474:7474'
+      - '7473:7473'
+      - '7687:7687'
