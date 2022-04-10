@@ -113,4 +113,4 @@ Akka의 액터모델 계층구조를, Neo4j Graph DB를 활용하여 시각화�
 
 ## 참고링크
 - https://github.com/DotNet4Neo4j/Neo4jClient/wiki
-- 
+- https://petabridge.com/blog/akkadotnet-ihostedservice/
