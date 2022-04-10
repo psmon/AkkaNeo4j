@@ -35,14 +35,14 @@ namespace AkkaNeo4j
              _graphEventActorRef.Tell(new GraphEvent()
             {
                 Action = "Create",
-                Alice = "AkkaSystem",
+                Uid = "AkkaSystem",
                 Name = "AkkaSystem"
             });
 
             _graphEventActorRef.Tell(new GraphEvent()
             {
                 Action = "Create",
-                Alice = ActorNameRules.RootName,
+                Uid = ActorNameRules.RootName,
                 Name = ActorNameRules.RootName
             });
 
@@ -52,12 +52,12 @@ namespace AkkaNeo4j
                 Name = "Parent",
                 From = new GraphElementIdenty()
                 {
-                    Alice = ActorNameRules.RootName,
+                    UId = ActorNameRules.RootName,
                     Name = ActorNameRules.RootName
                 },
                 To = new GraphElementIdenty()
                 {
-                    Alice = "AkkaSystem",
+                    UId = "AkkaSystem",
                     Name = "AkkaSystem"
                 }
             });
@@ -65,7 +65,7 @@ namespace AkkaNeo4j
             _graphEventActorRef.Tell(new GraphEvent()
             {
                 Action = "Create",
-                Alice = "GraphEventActor",
+                Uid = "GraphEventActor",
                 Name = "GraphEventActor"
             });
 
@@ -75,12 +75,12 @@ namespace AkkaNeo4j
                 Name = "Parent",
                 From = new GraphElementIdenty()
                 {
-                    Alice = "GraphEventActor",
+                    UId = "GraphEventActor",
                     Name = "GraphEventActor"
                 },
                 To = new GraphElementIdenty()
                 {
-                    Alice = ActorNameRules.RootName,
+                    UId = ActorNameRules.RootName,
                     Name = ActorNameRules.RootName
                 }
             });
@@ -115,9 +115,10 @@ namespace AkkaNeo4j
             depth1_3.Tell(new CreateChild(){ ActorName = "c1" } );
             depth1_3.Tell(new CreateChild(){ ActorName = "c2" } );
             depth1_3.Tell(new CreateChild(){ ActorName = "c3" } );
-
+            
+            Task.Delay(500).Wait(); //wait for actor create
             var depth2_1 =_actorSystem.ActorSelection("user/a/a1");
-            var depth2_2 =_actorSystem.ActorSelection("user/a/b1");
+            var depth2_2 =_actorSystem.ActorSelection("user/b/b1");
 
             depth2_1.Tell(new CreateChild(){ ActorName = "a11" } );
             depth2_1.Tell(new CreateChild(){ ActorName = "a12" } );
@@ -127,6 +128,9 @@ namespace AkkaNeo4j
             depth2_2.Tell(new CreateChild(){ ActorName = "b12" } );
             depth2_2.Tell(new CreateChild(){ ActorName = "b13" } );
 
+            Task.Delay(500).Wait(); //0.5초뒤 액터 삭제
+            var depth2_2_b13 =_actorSystem.ActorSelection("user/b/b1/b13");
+            depth2_2_b13.Tell("stop");
 
             // add a continuation task that will guarantee shutdown of application if ActorSystem terminates
             _actorSystem.WhenTerminated.ContinueWith(tr => {

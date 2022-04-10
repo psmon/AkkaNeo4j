@@ -33,18 +33,35 @@ namespace AkkaNeo4j.Actors
                         }
                         break;
                     case "Create":
-                        {                           
-                            await cypher.Write
-                                .Create($"(alice:{graphEvent.Alice} {{name:'{graphEvent.Name}'}})")
+                        {  
+                            await cypher
+                                .Create($"(element:GraphElementIdenty {{ UId: '{graphEvent.Uid}', Name:'{graphEvent.Name}'}})")
                                 .ExecuteWithoutResultsAsync();
+
+                            logger.Info($"Create : {graphEvent.Uid}");
+                        }
+                        break;
+                    case "Delete":
+                        {
+                            //Delete a element and all inbound relationships
+                            await cypher
+                                .OptionalMatch("()<-[r]-(element:GraphElementIdenty)")
+                                .Where((GraphElementIdenty element) => element.UId == graphEvent.Uid)
+                                .Delete("r, element")                                
+                                .ExecuteWithoutResultsAsync();
+
+                            logger.Info($"Delete : {graphEvent.Uid}");
                         }
                         break;
                     case "Relation":
                         {
-                            await cypher.Write
-                                .Match($"(a:{graphEvent.From.Alice}),(b:{graphEvent.To.Alice})")
-                                .Where($"a.name = '{graphEvent.From.Name}' AND b.name = '{graphEvent.To.Name}'")
-                                .Create($"(a)-[r:{graphEvent.Name}]->(b)").ExecuteWithoutResultsAsync();
+                            await cypher
+                                .Match($"(a:GraphElementIdenty),(b:GraphElementIdenty)")
+                                .Where($"a.UId = '{graphEvent.From.UId}' AND b.UId = '{graphEvent.To.UId}'")
+                                .Create($"(a)-[r:{graphEvent.Name}]->(b)")
+                                .ExecuteWithoutResultsAsync();
+
+                            logger.Info($"Relation : {graphEvent.Name} {graphEvent.From.UId} -> {graphEvent.To.UId}");
                         }
                         break;
                 }

@@ -1,42 +1,54 @@
 # AkkaNeo4j
 
-AkkaÀÇ ¾×ÅÍ¸ğµ¨ °èÃş±¸Á¶¸¦, Neo4j Graph DB¸¦ È°¿ëÇÏ¿© ½Ã°¢È­ÇÏ´Â º¯Á¾ ÇÁ·ÎÁ§Æ®·Î~
+Akkaì˜ ì•¡í„°ëª¨ë¸ ê³„ì¸µêµ¬ì¡°ë¥¼, Neo4j Graph DBë¥¼ í™œìš©í•˜ì—¬ ì‹œê°í™”í•˜ëŠ” ë³€ì¢… í”„ë¡œì íŠ¸ë¡œ~
 
-Asp.net Core¿¡¼­ DI¸¦ È°¿ëÇÏ¿© ¾×ÅÍ¸¦ ±¸¼ºÇÏ´Â ¹æ¹ıÀ» »ìÆìº¼¼ö ÀÖ½À´Ï´Ù.
+- Asp.net Coreì—ì„œ DIë¥¼ í™œìš©í•˜ì—¬ ì•¡í„°ë¥¼ êµ¬ì„±í•˜ëŠ” ë°©ë²•ì„ ì‚´í´ë³¼ìˆ˜ ìˆìŠµë‹ˆë‹¤.
+- DockerComposeë¥¼ í™œìš©í•˜ì—¬, Neo4j + AkkaNetApp í†µí•©ë¡œì»¬ ì‹¤í–‰ ê°€ëŠ¥í•©ë‹ˆë‹¤.
+- ì•¡í„°ë¥¼ ì‹œê°í™”í•¨ìœ¼ë¡œ Actorì˜ LifeCycleì„ í…ŒìŠ¤íŠ¸ í• ìˆ˜ ìˆìŠµë‹ˆë‹¤.
 
-DockerCompose¸¦ È°¿ëÇÏ¿©, Neo4j + AkkaNetApp ÅëÇÕ·ÎÄÃ ½ÇÇà °¡´ÉÇÕ´Ï´Ù.
 
 
+## ë¡œì»¬ì‹¤í–‰
 
-## ·ÎÄÃ½ÇÇà
-
+- ì „ì²´êµ¬ë™ : docker-compose up -d (ë˜ëŠ” VisualStudio DockerToolì´ìš© )
 - Neo4j : http://localhost:7474/browser/
 
-
-## ¾×ÅÍ°èÃş±¸Á¶
+## ì•¡í„°ê³„ì¸µêµ¬ì¡°
 
 ![graph1](./Doc/graph1.png)
 
 
-## Code Sample
-                var depth1_1 = _actorSystem.ActorOf(Props.Create<SimpleActor>("a", _graphEventActorRef),"a");
-                var depth1_2 = _actorSystem.ActorOf(Props.Create<SimpleActor>("b", _graphEventActorRef),"b");
-                var depth1_3 = _actorSystem.ActorOf(Props.Create<SimpleActor>("c", _graphEventActorRef),"c");
+## Sample Code
+
+### 
+
+    //Neo4j ì´ë²¤íŠ¸ë¥¼ ë‹´ë‹¹í•˜ëŠ” ì•¡í„°ìƒì„±
+    _graphEventActorRef = _actorSystem.ActorOf(Props.Create<GraphEventActor>(_graphEngine),"GraphEventActor");
+
+### ì•¡í„°ìƒì„±
+
+    //
+    var depth1_1 = _actorSystem.ActorOf(Props.Create<SimpleActor>("a", _graphEventActorRef),"a");
+    var depth1_2 = _actorSystem.ActorOf(Props.Create<SimpleActor>("b", _graphEventActorRef),"b");
+    var depth1_3 = _actorSystem.ActorOf(Props.Create<SimpleActor>("c", _graphEventActorRef),"c");
 
 
-                _graphActorRef.Tell(new GraphEvent()
-                {
-                    Action = "Relation",                           
-                    Name = "Parent",
-                    From = new GraphElementIdenty()
-                    {
-                        Alice = _actorName,
-                        Name = _actorName
-                    },
-                    To = new GraphElementIdenty()
-                    {
-                        Alice = ParentName,
-                        Name = ParentName
-                    }
-                });
+### ìƒì„±ì‹œ Graph ì´ë²¤íŠ¸ ë°œìƒ
 
+    //ì•¡í„° ìƒì„±ì‹œ 
+    public SimpleActor(string ActorName, IActorRef graphActorRef)
+    {
+        _graphActorRef = graphActorRef;
+        _actorName = ActorName;
+
+        _graphActorRef.Tell(new GraphEvent()
+        {
+            Action = "Create",
+            Alice = ActorName,
+            Name = ActorName
+        });
+    ...............,
+
+## ì°¸ê³ ë§í¬
+- https://github.com/DotNet4Neo4j/Neo4jClient/wiki
+- 

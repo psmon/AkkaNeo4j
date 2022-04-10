@@ -32,8 +32,8 @@ namespace AkkaNeo4j.Actors
             _graphActorRef.Tell(new GraphEvent()
             {
                 Action = "Create",
-                Alice = ActorName,
-                Name = ActorName
+                Uid = _actorName,
+                Name = _actorName
             });
             
             var ParentName= Context.Parent.Path.Name;
@@ -48,12 +48,12 @@ namespace AkkaNeo4j.Actors
                     Name = "Parent",
                     From = new GraphElementIdenty()
                     {
-                        Alice = ActorName,
+                        UId = ActorName,
                         Name = ActorName
                     },
                     To = new GraphElementIdenty()
                     {
-                        Alice = ActorNameRules.RootName,
+                        UId = ActorNameRules.RootName,
                         Name = ActorNameRules.RootName
                     }
                 });
@@ -66,12 +66,12 @@ namespace AkkaNeo4j.Actors
                     Name = "Parent",
                     From = new GraphElementIdenty()
                     {
-                        Alice = _actorName,
+                        UId = _actorName,
                         Name = _actorName
                     },
                     To = new GraphElementIdenty()
                     {
-                        Alice = ParentName,
+                        UId = ParentName,
                         Name = ParentName
                     }
                 });
@@ -80,11 +80,25 @@ namespace AkkaNeo4j.Actors
             ReceiveAsync<string>(async text =>
             {
                 Console.WriteLine($"ReceiveAsync : {0}",text);
+                if(text == "stop")
+                {
+                    Context.Stop(Self);
+                }
             });
 
             Receive<CreateChild>(async child =>
             {
-                Context.ActorOf(Props.Create<SimpleActor>(child.ActorName, _graphActorRef), child.ActorName);
+                Context.ActorOf(Props.Create<SimpleActor>(child.ActorName, _graphActorRef), child.ActorName);                
+            });
+        }
+
+        protected override void PostStop()
+        {
+            _graphActorRef.Tell(new GraphEvent()
+            {
+                Action = "Delete",
+                Uid = _actorName,
+                Name = _actorName
             });
         }
     }
